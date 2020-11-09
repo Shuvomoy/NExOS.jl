@@ -1,0 +1,99 @@
+ ### Matrix Completion Problem
+
+A matrix completion problem can be formulated as the following optimization problem:
+
+$$
+\begin{array}{ll}
+\textrm{minimize} & \sum_{(i,j)\in\Omega}(X_{ij}-Z_{ij})^{2}\\
+\textrm{subject to} & \mathop{{\bf rank}}(X)\leq r\\
+ & \|X\|_{2}\leq M\\
+ & X\in\mathbf{R}^{m\times n},
+\end{array}
+$$
+
+where $Z\in\mathbf{R}^{m\times n}$ is the matrix whose entries $Z_{ij}$ are observable for $(i,j)\in\Omega$. Based on these observed entries, our goal is to construct a matrix $X\in\mathbf{R}^{m\times n}$ that has rank $r$.
+
+First, of course, we load our packages.
+
+```julia
+using Random, LinearAlgebra, NExOS
+
+Random.seed!(1234)
+```
+
+Construct a random $$m\times n$$ matrix matrix of rank $n$.
+
+```julia
+m,n,k = 40,40,2
+Zfull = randn(m,k)*randn(k,n) # ground truth data
+M = opnorm(Zfull,2) # this is the bound on our constraint ||X||_2 ≦ M
+```
+
+Suppose that we only observe a fraction of entries in Zfull. Let us find the indices of all the elements that are available.
+
+```julia
+n_obs = 600
+Zobs = fill(NaN,(m,n))
+obs = randperm(m*n)[1:n_obs]
+Zobs[obs] .= Zfull[obs] # partially observed matrix
+```
+
+Plot the ground-truth, full dataset and our partial observations
+
+```julia
+using PyPlot
+```
+
+Plot the ground-truth, full dataset and our partial observations
+
+```julia
+figure(figsize=(7,14))
+subplot(1,2,1)
+imshow(Zfull,cmap=ColorMap("Blues"),interpolation="None")
+xticks([]),yticks([]),title("True Data",fontweight="bold")
+
+subplot(1,2,2)
+imshow(Zobs,cmap=ColorMap("Blues"),interpolation="None")
+xticks([]),yticks([]),title("Observed Data",fontweight="bold")
+show()
+PyPlot.display_figs()
+```
+
+Let us create our problem now:
+
+```julia
+M = opnorm(Zfull,2)
+f = SquaredLossMatrixCompletion(Zobs, iterative = true)
+r = rank(Zfull)
+Z0 = zeros(size(Zobs))
+C = RankSet(M, r)
+setting = NExOS.Setting(μ_max = 5, μ_min = 1e-8, μ_mult_fact = 0.5, n_iter_min = 1000, n_iter_max = 1000, verbose = true, freq = 1000, tol = 1e-4, γ_updt_rule = :safe)
+problem = NExOS.Problem(f, C, setting.β, Z0)
+```
+
+Time to solve our problem
+
+```julia
+state_final = NExOS.solve!(problem, setting)
+
+#
+Z_estimated = state_final.x
+```
+
+Finally, we plot a simple histogram to see how much of the matrix has been recovered.
+
+```julia
+figure(figsize=(8,3))
+PyPlot.hist(vec(Zfull - Z_estimated ),100)
+xlim([-0.5,0.5]),xlabel("Absolute Errors/Residuals",fontweight="bold"),tight_layout()
+show()
+PyPlot.display_figs()
+```
+So, `NExOS` does a good job!
+
+```julia
+using Weave
+cd("C:\\Users\\shuvo\\Desktop") # directory that contains the .jmd file
+tangle("Matrix_completion_problem_NEXOS.jmd", informat = "markdown") # convert the .jmd file into a .jl file that will contain the code
+convert_doc("Matrix_completion_problem_NEXOS.jmd", "Matrix_completion_problem_NEXOS.ipynb")
+ ```

@@ -1,0 +1,64 @@
+ ### Solving Sparse Regression using `NExOS.jl`
+
+The sparse regression problem (also known as regressor selection problem) is concerned with approximating a vector $b\in\mathbf{R}^{m}$ with a linear combination of at most $k$ columns of a matrix $A\in\mathbf{R}^{m\times d}$ with bounded coefficients. The problem can be written as the following optimization
+problem
+$$
+\begin{equation}
+\begin{array}{ll}
+\textrm{minimize} & \|Ax-b\|_{2}^{2}+\frac{\beta}{2}\|x\|^{2}\\
+\textrm{subject to} & \mathbf{card}(x)\leq k\\
+ & \|x\|_{\infty}\leq M,
+\end{array}
+\end{equation}
+$$
+where $x\in\mathbf{R}^{d}$ is the decision variable, and $A\in\mathbf{R}^{m\times d},b\in\mathbf{R}^{m},$ and $M>0$ are problem data.
+
+First, load the packages.
+
+```julia
+using Random, NExOS, ProximalOperators
+```
+
+Let us generate some random data for this problem.
+
+
+```julia
+m = 25
+n = 50
+A = randn(m,n)
+A = randn(m,n)
+b = randn(m)
+M = 100
+k = convert(Int64, round(m/3))
+beta = 10^-10
+```
+
+Create the problem instance in `NExOS`.
+
+```julia
+C = SparseSet(M, k) # Create the set
+f = LeastSquares(A, b, iterative = true) # Create the function
+setting = NExOS.Setting(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = true, freq = 250, γ_updt_rule = :adaptive, β = beta) # setting
+z0 = zeros(n) # create an initial point
+problem = NExOS.Problem(f, C, setting.β, z0) # problem instance
+```
+
+Time to solve the problem.
+
+```julia
+state_final = NExOS.solve!(problem, setting)
+```
+
+Let us take a look at the quality of the solution.
+
+```julia
+log10(state_final.fxd_pnt_gap) <= -4 # if the fixed point gap is less than 10^-4 (to determin if the algorithm has converged)
+```
+
+```julia
+log10(state_final.fsblt_gap) <= -4 # this is to test if the found solution by NExOS is locally optimal
+```
+
+```julia
+f(state_final.x) # this gives the objective value of the solution found by NExOS
+```
