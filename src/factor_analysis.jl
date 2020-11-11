@@ -26,21 +26,21 @@ mutable struct StateFactorAnalysisModel #{R <: Real, A <: AbstractMatrix{ <: Rea
     γ #::R # current value of γ
 end
 
-## this function constructs the very first state for the problem and setting for the factor analysis model
-function StateFactorAnalysisModel(problem::ProblemFactorAnalysisModel, setting::Setting)
+## this function constructs the very first state for the problem and settings for the factor analysis model
+function StateFactorAnalysisModel(problem::ProblemFactorAnalysisModel, settings::Settings)
 
-    # this function constructs the very first state for the problem and setting
+    # this function constructs the very first state for the problem and settings
     Z0 = copy(problem.Z0)
     z0 = copy(problem.z0)
     X0 = zero(Z0)
     x0 = zero(z0)
     Y0 = zero(Z0)
     y0 = zero(z0)
-    i = copy(setting.n_iter_max) # iteration number where best fixed point gap is reached
-    fxd_pnt_gap = copy(setting.big_M)
-    fsblt_gap = copy(setting.big_M)
-    μ = copy(setting.μ_max)
-    γ = γ_from_μ(μ, setting)
+    i = copy(settings.n_iter_max) # iteration number where best fixed point gap is reached
+    fxd_pnt_gap = copy(settings.big_M)
+    fsblt_gap = copy(settings.big_M)
+    μ = copy(settings.μ_max)
+    γ = γ_from_μ(μ, settings)
 
     return StateFactorAnalysisModel(X0, x0, Y0, y0, Z0, z0, i, fxd_pnt_gap, fsblt_gap, μ, γ)
 
@@ -58,15 +58,15 @@ mutable struct InitInfoFactorAnalysisModel #{ A <: AbstractMatrix{ <: Real }, V 
 
 end
 
-## Of course, we will need a constructor for the InitInfoFactorAnalysisModel type, given the user input. The user inputs are problem::problem, setting::setting.
+## Of course, we will need a constructor for the InitInfoFactorAnalysisModel type, given the user input. The user inputs are problem::problem, settings::settings.
 
-function InitInfoFactorAnalysisModel(problem::ProblemFactorAnalysisModel, setting::Setting)
+function InitInfoFactorAnalysisModel(problem::ProblemFactorAnalysisModel, settings::Settings)
 
     ## constructs the initial NExOS information
     Z0 = copy(problem.Z0)
     z0 = copy(problem.z0) # need to understand if copy is necessary
-    μ = copy(setting.μ_max)
-    γ = γ_from_μ(μ, setting)
+    μ = copy(settings.μ_max)
+    γ = γ_from_μ(μ, settings)
 
     return InitInfoFactorAnalysisModel(Z0, z0, μ, γ)
 
@@ -76,7 +76,7 @@ end
 
 ## update the state for factor analysis model
 
-function update_state_fam!(state::StateFactorAnalysisModel, init_info::InitInfoFactorAnalysisModel, problem::ProblemFactorAnalysisModel, setting::Setting)
+function update_state_fam!(state::StateFactorAnalysisModel, init_info::InitInfoFactorAnalysisModel, problem::ProblemFactorAnalysisModel, settings::Settings)
 
     # extract information from the state and init info
     X = state.X
@@ -85,7 +85,7 @@ function update_state_fam!(state::StateFactorAnalysisModel, init_info::InitInfoF
     y = state.y
     Z = init_info.Z0
     z = init_info.z0 # TODO: Need to write the InitInfoFactorAnalysisModel
-    β = setting.β
+    β = settings.β
     γ = init_info.γ
     μ = init_info.μ
 
@@ -96,11 +96,11 @@ function update_state_fam!(state::StateFactorAnalysisModel, init_info::InitInfoF
     best_point_y = y
     best_point_Z = Z
     best_point_z = z
-    best_fxd_pnt_gap = setting.big_M
-    best_fsblt_gap = setting.big_M
+    best_fxd_pnt_gap = settings.big_M
+    best_fsblt_gap = settings.big_M
 
     i = 1
-    while i <= setting.n_iter_max
+    while i <= settings.n_iter_max
         X, x, Y, y, Z, z = inner_iteration_fam(X, x, Y, y, Z, z, β, γ, μ, problem) # Done: Need to write inner iteration factor analysis model: inner_iteration_fam
         crnt_fxd_pnt_gap = norm(x-y, Inf)+norm(X-Y, Inf)
         Y_fsbl = Π_exact(RankSet(problem.M, problem.r), Y)
@@ -119,16 +119,16 @@ function update_state_fam!(state::StateFactorAnalysisModel, init_info::InitInfoF
         end # if
 
         # display important information
-        if setting.verbose == true
-            if mod(i, setting.freq) == 0
+        if settings.verbose == true
+            if mod(i, settings.freq) == 0
                 @info "μ = $μ | iteration = $i | log fixed point gap = $(log10(crnt_fxd_pnt_gap)) | log feasibility gap = $(log10(crnt_fsblt_gap))"
             end # if
         end # if
 
         # termination condition check
-        if crnt_fxd_pnt_gap <= setting.tol
-            if setting.verbose == true
-                @info "μ = $μ | log fixed point gap reached $(log10(setting.tol))"
+        if crnt_fxd_pnt_gap <= settings.tol
+            if settings.verbose == true
+                @info "μ = $μ | log fixed point gap reached $(log10(settings.tol))"
             end
             break
         end #if
@@ -152,7 +152,7 @@ function update_state_fam!(state::StateFactorAnalysisModel, init_info::InitInfoF
     state.γ = γ
 
     # Print information about the best point
-    if setting.verbose == true
+    if settings.verbose == true
         @info "information about the best state found for μ = $(state.μ)"
         @info "μ = $(state.μ) | log fixed point gap = $(log10(state.fxd_pnt_gap)) | log feasibility gap = $(log10(state.fsblt_gap)) | inner iterations = $(state.i)"
     end
@@ -281,10 +281,10 @@ function prox_NExOS_fam(Σ, M, γ, X, d; X_tl_sv = nothing, d_tl_sv = nothing, w
 
 end
 
-function update_init_info_experimental_fam!(state::StateFactorAnalysisModel, init_info::InitInfoFactorAnalysisModel, problem::ProblemFactorAnalysisModel, setting::Setting)
+function update_init_info_experimental_fam!(state::StateFactorAnalysisModel, init_info::InitInfoFactorAnalysisModel, problem::ProblemFactorAnalysisModel, settings::Settings)
 
-    init_info.μ = init_info.μ*setting.μ_mult_fact
-    init_info.γ = γ_from_μ(init_info.μ, setting)
+    init_info.μ = init_info.μ*settings.μ_mult_fact
+    init_info.γ = γ_from_μ(init_info.μ, settings)
     init_info.z0 = state.z
     init_info.Z0 = state.Z
 

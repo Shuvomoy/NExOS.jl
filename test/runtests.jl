@@ -21,11 +21,11 @@ using Random, LinearAlgebra
 
     f = LeastSquares(A, b, iterative = true)
 
-    setting = NExOS.Setting(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = true, freq = 250, γ_updt_rule = :adaptive)
+    settings = NExOS.Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = true, freq = 250, γ_updt_rule = :adaptive)
 
-    problem = NExOS.Problem(f, C, setting.β, z0)
+    problem = NExOS.Problem(f, C, settings.β, z0)
 
-    state_final = NExOS.solve!(problem, setting)
+    state_final = NExOS.solve!(problem, settings)
 
     @test log10(state_final.fxd_pnt_gap) <= -4
 
@@ -57,11 +57,11 @@ end
 
     D = NExOS.RankSet(M, r)
 
-    setting = NExOS.Setting(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.5, verbose = true, freq = 250, γ_updt_rule = :safe)
+    settings = NExOS.Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.5, verbose = true, freq = 250, γ_updt_rule = :safe)
 
-    problem = NExOS.Problem(f, D, setting.β, Z0)
+    problem = NExOS.Problem(f, D, settings.β, Z0)
 
-    state_final = NExOS.solve!(problem, setting)
+    state_final = NExOS.solve!(problem, settings)
 
     f(state_final.x)
 
@@ -100,11 +100,11 @@ end
 
     C = RankSet(M, r)
 
-    setting = NExOS.Setting(μ_max = 5, μ_min = 1e-8, μ_mult_fact = 0.5, n_iter_min = 1000, n_iter_max = 1000, verbose = true, freq = 250, tol = 1e-4, γ_updt_rule = :safe)
+    settings = NExOS.Settings(μ_max = 5, μ_min = 1e-8, μ_mult_fact = 0.5, n_iter_min = 1000, n_iter_max = 1000, verbose = true, freq = 250, tol = 1e-4, γ_updt_rule = :safe)
 
-    problem = NExOS.Problem(f, C, setting.β, Z0)
+    problem = NExOS.Problem(f, C, settings.β, Z0)
 
-    state_final = NExOS.solve!(problem, setting)
+    state_final = NExOS.solve!(problem, settings)
 
     @test log10(state_final.fxd_pnt_gap) <= -4
 

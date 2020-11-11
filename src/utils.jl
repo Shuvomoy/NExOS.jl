@@ -1,13 +1,13 @@
 ## Our rule for chosing γ from μ
 
-function γ_from_μ(μ::R, setting::Setting) where {R <: Real}
-    if setting.γ_updt_rule == :safe
-        return abs(cbrt(setting.μ_min)) # cbrt also works quite well
-    elseif setting.γ_updt_rule == :adaptive
+function γ_from_μ(μ::R, settings::Settings) where {R <: Real}
+    if settings.γ_updt_rule == :safe
+        return abs(cbrt(settings.μ_min)) # cbrt also works quite well
+    elseif settings.γ_updt_rule == :adaptive
         γ_adaptive = (10^-3)*abs(sqrt(μ))
         return γ_adaptive # adaptive actually does not work very well
-    elseif setting.γ_updt_rule == :adaptiveplus
-        log_γ_adaptiveplus = ((3/(log10(setting.μ_max)+10))*(log10(μ)+10))-6
+    elseif settings.γ_updt_rule == :adaptiveplus
+        log_γ_adaptiveplus = ((3/(log10(settings.μ_max)+10))*(log10(μ)+10))-6
         γ_adaptiveplus = 10^log_γ_adaptiveplus
         return γ_adaptiveplus
     else
@@ -100,13 +100,13 @@ end
 
 # update the state
 
-function update_state!(state::State, init_info::InitInfo, problem::Problem, setting::Setting)
+function update_state!(state::State, init_info::InitInfo, problem::Problem, settings::Settings)
 
     # extract information from the state and init info
     x = state.x
     y = state.y
     z = init_info.z0
-    β = setting.β
+    β = settings.β
     γ = init_info.γ
     μ = init_info.μ
 
@@ -114,11 +114,11 @@ function update_state!(state::State, init_info::InitInfo, problem::Problem, sett
     best_point_x = x
     best_point_y = y
     best_point_z = z
-    best_fxd_pnt_gap = setting.big_M
-    best_fsblt_gap = setting.big_M
+    best_fxd_pnt_gap = settings.big_M
+    best_fsblt_gap = settings.big_M
 
     i = 1
-    while i <= setting.n_iter_max
+    while i <= settings.n_iter_max
         x, y, z = inner_iteration(x, y, z, β, γ, μ, problem)
         crnt_fxd_pnt_gap = norm(x-y, Inf)
         y_fsbl = Π_exact(problem.C, y)
@@ -134,16 +134,16 @@ function update_state!(state::State, init_info::InitInfo, problem::Problem, sett
         end # if
 
         # display important information
-        if setting.verbose == true
-            if mod(i, setting.freq) == 0
+        if settings.verbose == true
+            if mod(i, settings.freq) == 0
                 @info "μ = $μ | iteration = $i | log fixed point gap = $(log10(crnt_fxd_pnt_gap)) | log feasibility gap = $(log10(crnt_fsblt_gap))"
             end # if
         end # if
 
         # termination condition check
-        if crnt_fxd_pnt_gap <= setting.tol
-            if setting.verbose == true
-                @info "μ = $μ | log fixed point gap reached $(log10(setting.tol))"
+        if crnt_fxd_pnt_gap <= settings.tol
+            if settings.verbose == true
+                @info "μ = $μ | log fixed point gap reached $(log10(settings.tol))"
             end
             break
         end #if
@@ -164,7 +164,7 @@ function update_state!(state::State, init_info::InitInfo, problem::Problem, sett
     state.γ = γ
 
     # Print information about the best point
-    if setting.verbose == true
+    if settings.verbose == true
         @info "information about the best state found for μ = $(state.μ)"
         @info "μ = $(state.μ) | log fixed point gap = $(log10(state.fxd_pnt_gap)) | log feasibility gap = $(log10(state.fsblt_gap)) | inner iterations = $(state.i)"
     end
@@ -221,14 +221,14 @@ end
 
 # Now we write the update init information function.
 
-function update_init_info!(state::State, init_info::InitInfo, problem::Problem, setting::Setting)
+function update_init_info!(state::State, init_info::InitInfo, problem::Problem, settings::Settings)
 
-    init_info.μ = init_info.μ*setting.μ_mult_fact
-    init_info.γ = γ_from_μ(init_info.μ, setting)
-    x_μ = Π_NExOS(problem.C, setting.β, init_info.γ, init_info.μ, state.x)
+    init_info.μ = init_info.μ*settings.μ_mult_fact
+    init_info.γ = γ_from_μ(init_info.μ, settings)
+    x_μ = Π_NExOS(problem.C, settings.β, init_info.γ, init_info.μ, state.x)
     u1 = similar(x_μ) # allocate memory
     gradient!(u1, problem.f, x_μ)
-    u = u1 + setting.β.*x_μ # this is a gradient of the function f + (β/2)*||⋅||^2 at x_μ
+    u = u1 + settings.β.*x_μ # this is a gradient of the function f + (β/2)*||⋅||^2 at x_μ
     # we are using the function gradient from proximaloperators.jl
     init_info.z0 = x_μ + init_info.γ*u
 
@@ -238,10 +238,10 @@ end
 
 # Experiment with the initial information
 
-function update_init_info_experimental!(state::State, init_info::InitInfo, problem::Problem, setting::Setting)
+function update_init_info_experimental!(state::State, init_info::InitInfo, problem::Problem, settings::Settings)
 
-    init_info.μ = init_info.μ*setting.μ_mult_fact
-    init_info.γ = γ_from_μ(init_info.μ, setting)
+    init_info.μ = init_info.μ*settings.μ_mult_fact
+    init_info.γ = γ_from_μ(init_info.μ, settings)
     init_info.z0 = state.z
 
     return init_info

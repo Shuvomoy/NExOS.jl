@@ -1,4 +1,3 @@
 /Manifest.toml
 *.jld2
-numerical_experiments/sparse_regression/data_files_in_jl_format/data_sparse_regression.jl
 numerical_experiments/*

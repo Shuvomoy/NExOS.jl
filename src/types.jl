@@ -26,12 +26,12 @@ struct Problem{F <: ProximableFunction, S <: ProxRegularSet, R <: Real, A <: Abs
 
 end
 
-##%% Setting function
+##%% Settings function
 
-# # setting
-#  This struct represents the user setting. It contains information regarding user specified value of different parameters
+# # settings
+#  This struct represents the user settings. It contains information regarding user specified value of different parameters
 
-struct Setting
+struct Settings
 
     # first comes description of different data type
 
@@ -48,7 +48,7 @@ struct Setting
     γ_updt_rule::Symbol # for now two rule: :safe and :adaptive, deafult will be :safe
 
     # constructor function
-    function Setting(;
+    function Settings(;
         μ_max = 1.0,
         μ_min = 1e-12,
         μ_mult_fact = 0.85,
@@ -84,17 +84,17 @@ end
 
 # Let us initialize the state data structure.
 
-function State(problem::Problem, setting::Setting)
+function State(problem::Problem, settings::Settings)
 
-    # this function constructs the very first state for the problem and setting
+    # this function constructs the very first state for the problem and settings
     z0 = copy(problem.z0)
     x0 = zero(z0)
     y0 = zero(z0)
-    i = copy(setting.n_iter_max) # iteration number where best fixed point gap is reached
-    fxd_pnt_gap = copy(setting.big_M)
-    fsblt_gap = copy(setting.big_M)
-    μ = copy(setting.μ_max)
-    γ = γ_from_μ(μ, setting) #
+    i = copy(settings.n_iter_max) # iteration number where best fixed point gap is reached
+    fxd_pnt_gap = copy(settings.big_M)
+    fsblt_gap = copy(settings.big_M)
+    μ = copy(settings.μ_max)
+    γ = γ_from_μ(μ, settings) #
 
     return State(x0, y0, z0, i, fxd_pnt_gap, fsblt_gap, μ, γ)
 
@@ -113,14 +113,14 @@ mutable struct InitInfo{T <: AbstractVecOrMat{<: Real}, R <: Real}
 
 end
 
-# Of course, we will need a constructor for the InitInfo type, given the user input. The user inputs are problem::problem, setting::setting.
+# Of course, we will need a constructor for the InitInfo type, given the user input. The user inputs are problem::problem, settings::settings.
 
-function InitInfo(problem::Problem, setting::Setting)
+function InitInfo(problem::Problem, settings::Settings)
 
     ## constructs the initial NExOS information
     z0 = copy(problem.z0) # need to understand if copy is necessary
-    μ = copy(setting.μ_max)
-    γ = γ_from_μ(μ, setting)
+    μ = copy(settings.μ_max)
+    γ = γ_from_μ(μ, settings)
 
     return InitInfo(z0, μ, γ)
 
