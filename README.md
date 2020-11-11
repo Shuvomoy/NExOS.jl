@@ -12,14 +12,47 @@ subject to  x ∈ X,
 
 where the decision variable `x` can be a vector in `ℜ^d` or a matrix in `ℜ^(m×d)` or a combination of both. The cost function `f` is convex, `β` is a positive parameter (can be arbitrarily small), and the constraint set `X` is a nonconvex prox-regular set. 
 
-## Installation/Usage
+## Installation
 
 In `Julia REPL`, type
 
 ```] add https://github.com/Shuvomoy/NExOS.jl```
 
-## Examples
-Please see the following `jupyter notebook` tutorials that describe how to use `NExOS.jl`. 
+## Usage
+
+Below is a short usage example on using `NExOS.jl` for sparse regression problem (for other examples, please see [Tutorials](#Tutorials)). 
+
+```julia
+# Load the packages
+using Random, NExOS, ProximalOperators
+
+# Random data generation 
+m = 25
+n = 50
+A = randn(m,n)
+A = randn(m,n)
+b = randn(m)
+M = 100
+k = convert(Int64, round(m/3))
+
+# Create the problem instance in NExOS
+C = SparseSet(M, k) # Create the set
+f = LeastSquares(A, b, iterative = true) # Create the function
+settings = Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = false, freq = 250, γ_updt_rule = :adaptive) # settings
+z0 = zeros(n) # create an initial point
+problem = Problem(f, C, settings.β, z0) # problem instance
+
+# Solve the problem
+state_final = solve!(problem, settings)
+
+# Extract solution info
+x_NExOS = state_final.x # solution found by NExOS
+p_star = f(x_NExOS) # objective value
+```
+
+## Tutorials
+
+Please see the following `jupyter notebook` tutorials that describe in more detail how to use `NExOS.jl`. 
 
 1. [Affine rank minimization](https://nbviewer.jupyter.org/github/Shuvomoy/NExOS.jl/blob/master/tutorials/Affine%20rank%20minimization%20using%20NExOS.jl.ipynb).
 2. [Matrix completion](https://nbviewer.jupyter.org/github/Shuvomoy/NExOS.jl/blob/master/tutorials/Matrix_completion_problem_NEXOS.ipynb).
