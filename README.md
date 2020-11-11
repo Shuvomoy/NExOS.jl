@@ -34,11 +34,12 @@ A = randn(m,n)
 b = randn(m)
 M = 100
 k = convert(Int64, round(m/3))
+beta = 10^-10
 
 # Create the problem instance in NExOS
 C = SparseSet(M, k) # Create the set
 f = LeastSquares(A, b, iterative = true) # Create the function
-settings = Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = false, freq = 250, γ_updt_rule = :adaptive) # settings
+settings = Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = false, freq = 250, γ_updt_rule = :adaptive, β = beta) # settings
 z0 = zeros(n) # create an initial point
 problem = Problem(f, C, settings.β, z0) # problem instance
 
