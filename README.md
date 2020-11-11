@@ -20,7 +20,7 @@ In `Julia REPL`, type
 
 ## Usage
 
-Below is a short usage example on using `NExOS.jl` for sparse regression problem (for other examples, please see [Tutorials](#Tutorials)). 
+Below is a short usage example on using `NExOS.jl` for [sparse regression problem](https://nbviewer.jupyter.org/github/Shuvomoy/NExOS.jl/blob/master/tutorials/sparse_regression_using_NExOS.ipynb) (for other examples, please see [Tutorials](#Tutorials)). 
 
 ```julia
 # Load the packages
@@ -29,7 +29,6 @@ using Random, NExOS, ProximalOperators
 # Random data generation 
 m = 25
 n = 50
-A = randn(m,n)
 A = randn(m,n)
 b = randn(m)
 M = 100
