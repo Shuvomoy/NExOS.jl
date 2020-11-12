@@ -16,7 +16,7 @@ where the decision variable `x` can be a vector in `ℜ^d` or a matrix in `ℜ^(
 
 In `Julia REPL`, type
 
-```] add https://github.com/Shuvomoy/NExOS.jl```
+```] add NExOS```
 
 ## Usage
 
