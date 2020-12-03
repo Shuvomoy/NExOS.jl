@@ -2,28 +2,28 @@
 
 ## Define the one shot function FactorAnalysisModel
 
-struct ProblemFactorAnalysisModel{A <: AbstractMatrix{ <: Real }, I <: Integer, R <: Real, V <: AbstractVector{ <:Real }}
-    Σ::A # This is part of the data, which is a positive semidefinite matrix
-    r::I # represents rank of the decision variable matrix X
-    M::R # upper bound on the operator-2 norm of decision variable matrix X
-    Z0::A # one initial state provided by the user (for the matrix part)
-    z0::V # one initial state provided by the user (the vector part)
+struct ProblemFactorAnalysisModel #{A <: AbstractMatrix{ <: Real }, I <: Integer, R <: Real, V <: AbstractVector{ <:Real }}
+    Σ #::A # This is part of the data, which is a positive semidefinite matrix
+    r #::I # represents rank of the decision variable matrix X
+    M #::R # upper bound on the operator-2 norm of decision variable matrix X
+    Z0 #::A # one initial state provided by the user (for the matrix part)
+    z0 #::V # one initial state provided by the user (the vector part)
 end
 
 ## This structure contains all the necessary information to describe a state
 
-mutable struct StateFactorAnalysisModel{R <: Real, A <: AbstractMatrix{ <: Real }, V <: AbstractVector{ <: Real}, I <: Integer} # Done
-    X::A # the first iterate matrix part
-    x::V # the first iterate vector part
-    Y::A # the second iterate matrix part
-    y::V # the second iterate vector part
-    Z::A # the third iterate matrix part
-    z::V # the third iterate vector part
-    i::I # iteration number
-    fxd_pnt_gap::R # fixed point gap for state
-    fsblt_gap::R # how feasible the current point is, this is measured by || x- Π_C(x) ||
-    μ::R # current value of μ
-    γ::R # current value of γ
+mutable struct StateFactorAnalysisModel #{R <: Real, A <: AbstractMatrix{ <: Real }, V <: AbstractVector{ <: Real}, I <: Integer} # Done
+    X #::A # the first iterate matrix part
+    x #::V # the first iterate vector part
+    Y #::A # the second iterate matrix part
+    y #::V # the second iterate vector part
+    Z #::A # the third iterate matrix part
+    z #::V # the third iterate vector part
+    i #::I # iteration number
+    fxd_pnt_gap #::R # fixed point gap for state
+    fsblt_gap #::R # how feasible the current point is, this is measured by || x- Π_C(x) ||
+    μ #::R # current value of μ
+    γ #::R # current value of γ
 end
 
 ## this function constructs the very first state for the problem and settings for the factor analysis model
@@ -48,13 +48,13 @@ end
 
 ## structure that describes the information to intialize our algorithm:
 
-mutable struct InitInfoFactorAnalysisModel{ A <: AbstractMatrix{ <: Real }, V <: AbstractVector{ <: Real}, R <: Real}
+mutable struct InitInfoFactorAnalysisModel #{ A <: AbstractMatrix{ <: Real }, V <: AbstractVector{ <: Real}, R <: Real}
 
     # this will have Z0, z0, γ, μ
-    Z0::A # initial condition (matrix part) to start an inner iteration
-    z0::V # initial condition (vector part) to start an inner iteration
-    μ::R # μ required start an inner iteration
-    γ::R # γ required to start an inner iteration
+    Z0 #::A # initial condition (matrix part) to start an inner iteration
+    z0 #::V # initial condition (vector part) to start an inner iteration
+    μ #::R # μ required start an inner iteration
+    γ #::R # γ required to start an inner iteration
 
 end
 
@@ -161,7 +161,8 @@ function update_state_fam!(state::StateFactorAnalysisModel, init_info::InitInfoF
 end
 
 # inner iteration function for FactorAnalysisModel
-function inner_iteration_fam(X::A, x::V, Y::A, y::V, Z::A, z::V, β::R, γ::R, μ::R, problem::ProblemFactorAnalysisModel) where { A <: AbstractMatrix{ <: Real }, V <: AbstractVector{ <: Real}, R <: Real}
+function inner_iteration_fam(X, x, Y, y, Z, z, β, γ, μ, problem::ProblemFactorAnalysisModel)
+    #(X::A, x::V, Y::A, y::V, Z::A, z::V, β::R, γ::R, μ::R, problem::ProblemFactorAnalysisModel) where { A <: AbstractMatrix{ <: Real }, V <: AbstractVector{ <: Real}, R <: Real}
     # old iteration: x = prox_NExOS(problem.f, β, γ, z)
     X, x = prox_NExOS_fam(problem.Σ, problem.M, γ, Z, z)
     Y = Π_NExOS(RankSet(problem.M, problem.r), β, γ, μ, 2*X - Z)
@@ -231,8 +232,7 @@ end
 
 ## put everything in a function
 # uses JuMP
-
-function prox_NExOS_fam(Σ::A, M::R, γ::R, X::A, d::V; X_tl_sv = nothing, d_tl_sv = nothing, warm_start = false) where {R <: Real, A <: AbstractMatrix{R}, V <:  AbstractVector{R}}
+function prox_NExOS_fam(Σ, M, γ, X, d; X_tl_sv = nothing, d_tl_sv = nothing, warm_start = false)
 
 	# This functions takes the input data Σ, γ, X, d and evaluates the proximal operator of the function f at the point (X,d)
 
