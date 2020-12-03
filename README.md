@@ -57,7 +57,7 @@ Please see the following `jupyter notebook` tutorials that describe in more deta
 1. [Affine rank minimization](https://nbviewer.jupyter.org/github/Shuvomoy/NExOS.jl/blob/master/tutorials/Affine%20rank%20minimization%20using%20NExOS.jl.ipynb).
 2. [Matrix completion](https://nbviewer.jupyter.org/github/Shuvomoy/NExOS.jl/blob/master/tutorials/Matrix_completion_problem_NEXOS.ipynb).
 3. [Sparse regression](https://nbviewer.jupyter.org/github/Shuvomoy/NExOS.jl/blob/master/tutorials/sparse_regression_using_NExOS.ipynb).
-4. [Low-rank factor analysis]().
+4. [Low-rank factor analysis](https://nbviewer.jupyter.org/github/Shuvomoy/NExOS.jl/blob/master/tutorials/Low-rank_factor_analysis_using_NExOS.ipynb).
 
 ## Acceptable functions and sets
 
