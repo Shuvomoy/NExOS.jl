@@ -111,27 +111,3 @@ end
     @test log10(state_final.fsblt_gap) <= -4
 
 end
-
-# Low rank factor analysis testing, requires MOSEK
-
-# using NExOS
-#
-# using LinearAlgebra, Convex, JuMP, MosekTools
-#
-# Σ = [1.0 -0.34019653769952096 -0.263030887801514 -0.14349389289304187 -0.18605860686109255; -0.34019653769952096 1.0 0.4848473200092671 0.3421745595621214 0.38218138592185846; -0.263030887801514 0.4848473200092671 1.0 0.3768343949936584 0.5028863662242727; -0.14349389289304187 0.3421745595621214 0.3768343949936584 1.0 0.3150998750134158; -0.18605860686109255 0.38218138592185846 0.5028863662242727 0.3150998750134158 1.0]
-#
-# n, _ = size(Σ)
-#
-# r = convert(Int64, round(rank(Σ)/2))
-#
-# M = 2*opnorm(Σ ,2)
-#
-# Z0 = Σ # zeros(n,n) Initial condition
-#
-# z0 = zeros(n) # Initial condition
-#
-# problem =  NExOS.ProblemFactorAnalysisModel(Σ, r, M, Z0, z0)
-#
-# settings = NExOS.Settings(μ_max = 1, μ_min = 1e-4, μ_mult_fact = 0.5, n_iter_min = 10, n_iter_max = 10, verbose = true, freq = 50, tol = 1e-2, γ_updt_rule = :adaptive)
-#
-# state_final = NExOS.solve!(problem, settings)
