@@ -15,11 +15,11 @@ TSVD = "9449cd9e-2762-5aa3-a617-5413e99d722e"
 
 [compat]
 julia = "^1"
-JuMP = ">=0.21.3"
-MosekTools = ">=0.9.3"
-OSQP = ">=0.6.0"
-ProximalOperators = ">=0.11.0"
-TSVD = ">=0.4.0"
+JuMP = "^0.21.3"
+MosekTools = "^0.9.3"
+OSQP = "^0.6.0"
+ProximalOperators = "^0.11.0"
+TSVD = "^0.4.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
