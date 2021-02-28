@@ -18,7 +18,7 @@ minimize    f(x)+(β/2)‖x‖^2
 subject to  x ∈ X,
 ```
 
-where the decision variable `x` can be a vector in `ℜ^d` or a matrix in `ℜ^(m×d)` or a combination of both. The cost function `f` is convex, `β` is a positive parameter (can be arbitrarily small), and the constraint set `X` is a nonconvex prox-regular set (please see [Acceptable functions and sets](#Acceptable functions and sets) for more details). 
+where the decision variable `x` can be a vector in `ℜ^d` or a matrix in `ℜ^(m×d)` or a combination of both. The cost function `f` is convex, `β` is a positive parameter (can be arbitrarily small), and the constraint set `X` is a nonconvex prox-regular set (please see [Acceptable functions and sets](#Acceptable-functions-and-sets) for more details). 
 
 ## Installation
 
