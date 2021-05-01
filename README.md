@@ -9,7 +9,7 @@
   <a href="#Contact">Contact</a> 
 </p>
 
-``NExOS.jl`` is a `Julia` package that implements [**N**onconvex **Ex**terior-point **O**perator **S**plitting algorithm](https://arxiv.org/abs/2011.04552) (**NExOS**). The package is tailored for minimizing a convex cost function over a nonconvex constraint set, where projection onto the constraint set is single-valued around points of interest. These types of sets are called *prox-regular* sets, *e.g.*, sets containing low-rank and sparsity constraints. 
+``NExOS.jl`` is a `Julia` package that implements [**N**onconvex **Ex**terior-point **O**perator **S**plitting algorithm](http://www.optimization-online.org/DB_FILE/2020/11/8099.pdf) (**NExOS**). The package is tailored for minimizing a convex cost function over a nonconvex constraint set, where projection onto the constraint set is single-valued around points of interest. These types of sets are called *prox-regular* sets, *e.g.*, sets containing low-rank and sparsity constraints. 
 
 ``NExOS.jl`` considers nonconvex optimization problems of the following form:
 
@@ -98,7 +98,7 @@ If you find `NExOS.jl` useful in your project, we kindly request that you cite t
   year={2020}
 }
 ```
-A preprint can be downloaded [here](https://arxiv.org/pdf/2011.04552.pdf).
+A preprint can be downloaded [here](http://www.optimization-online.org/DB_FILE/2020/11/8099.pdf).
 
 ## Reporting issues
 Please report any issues via the [Github issue tracker](https://github.com/Shuvomoy/NExOS.jl/issues). All types of issues are welcome including bug reports, feature requests, implementation for a specific research problem and so on.
