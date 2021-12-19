@@ -21,7 +21,9 @@ using Random, LinearAlgebra
 
     f = LeastSquares(A, b, iterative = true)
 
-    settings = NExOS.Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = true, freq = 250, γ_updt_rule = :adaptive)
+    # settings = NExOS.Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = true, freq = 250, γ_updt_rule = :adaptive)
+	
+	settings = NExOS.Settings(μ_max = 2, μ_mult_fact = 0.85, verbose = true, freq = 250, γ_updt_rule = :adaptive)
 
     problem = NExOS.Problem(f, C, settings.β, z0)
 
@@ -57,7 +59,9 @@ end
 
     D = NExOS.RankSet(M, r)
 
-    settings = NExOS.Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.5, verbose = true, freq = 250, γ_updt_rule = :safe)
+    # settings = NExOS.Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.5, verbose = true, freq = 250, γ_updt_rule = :safe)
+	
+	settings = NExOS.Settings(μ_max = 2, μ_mult_fact = 0.5, verbose = true, freq = 250, γ_updt_rule = :safe)
 
     problem = NExOS.Problem(f, D, settings.β, Z0)
 
@@ -100,7 +104,9 @@ end
 
     C = RankSet(M, r)
 
-    settings = NExOS.Settings(μ_max = 5, μ_min = 1e-8, μ_mult_fact = 0.5, n_iter_min = 1000, n_iter_max = 1000, verbose = true, freq = 250, tol = 1e-4, γ_updt_rule = :safe)
+    # settings = NExOS.Settings(μ_max = 5, μ_min = 1e-8, μ_mult_fact = 0.5, n_iter_min = 1000, n_iter_max = 1000, verbose = true, freq = 250, tol = 1e-4, γ_updt_rule = :safe)
+	
+	settings = NExOS.Settings(μ_max = 5, μ_mult_fact = 0.5, n_iter_min = 1000, n_iter_max = 1000, verbose = true, freq = 250, tol = 1e-4, γ_updt_rule = :safe)
 
     problem = NExOS.Problem(f, C, settings.β, Z0)
 

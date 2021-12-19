@@ -1,5 +1,9 @@
 ##%% Load the packages
 
+# constant value
+
+μ_min = 10^-8
+
 # First, we load the packages.
 
 using ProximalOperators, LinearAlgebra, TSVD, SparseArrays, OSQP, JuMP, MosekTools
@@ -36,7 +40,7 @@ struct Settings
     # first comes description of different data type
 
     μ_max::Float64 # starting μ
-    μ_min::Float64 # ending μ
+    # μ_min::Float64 # ending μ
     μ_mult_fact::Float64 # multiplicative factor to reduce μ
     n_iter_min::Int64 # minimum number of iterations per fixed μ
     n_iter_max::Int64 # maximum number of iterations per fixed μ
@@ -50,7 +54,7 @@ struct Settings
     # constructor function
     function Settings(;
         μ_max = 1.0,
-        μ_min = 1e-12,
+        # μ_min = 1e-12,
         μ_mult_fact = 0.85,
         n_iter_min = 1000,
         n_iter_max = 1000,
@@ -61,7 +65,8 @@ struct Settings
         freq = 10,
         γ_updt_rule = :safe
         )
-        new(μ_max, μ_min, μ_mult_fact, n_iter_min, n_iter_max, big_M, β, tol, verbose, freq, γ_updt_rule)
+        # new(μ_max, μ_min, μ_mult_fact, n_iter_min, n_iter_max, big_M, β, tol, verbose, freq, γ_updt_rule)
+		new(μ_max, μ_mult_fact, n_iter_min, n_iter_max, big_M, β, tol, verbose, freq, γ_updt_rule)
     end
 
 end

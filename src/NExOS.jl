@@ -37,7 +37,7 @@ function solve!(problem::Problem, settings::Settings)
     init_info = InitInfo(problem, settings) # create intial information
 
     # now this first state goes into the iteration_outer!(state, problem, settings) and we keep running it until our termination condtion has been met
-    while state.μ >= settings.μ_min
+    while state.μ >= μ_min # settings.μ_min
         # run the outer iteration update procedure
         state = update_state!(state, init_info, problem, settings)
         # init_info = update_init_info!(state, init_info, problem, settings )
@@ -64,7 +64,7 @@ function solve!(problem::ProblemFactorAnalysisModel, settings::Settings)
     #create the optimization problem to compute the proximal operator
 
     # now this first state goes into the iteration_outer!(state, problem, settings) and we keep running it until our termination condtion has been met
-    while state.μ >= settings.μ_min
+    while state.μ >= μ_min # settings.μ_min
         # run the outer iteration update procedure
         state = update_state_fam!(state, init_info, problem, settings)
         # init_info = update_init_info!(state, init_info, problem, settings )

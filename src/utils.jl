@@ -2,7 +2,7 @@
 
 function γ_from_μ(μ::R, settings::Settings) where {R <: Real}
     if settings.γ_updt_rule == :safe
-        return abs(cbrt(settings.μ_min)) # cbrt also works quite well
+        return abs(cbrt(μ_min)) # cbrt also works quite well
     elseif settings.γ_updt_rule == :adaptive
         γ_adaptive = (10^-3)*abs(sqrt(μ))
         return γ_adaptive # adaptive actually does not work very well

@@ -8,8 +8,7 @@
   <a href="#Citing">Citing</a> •
   <a href="#Contact">Contact</a> 
 </p>
-
-``NExOS.jl`` is a `Julia` package that implements [**N**onconvex **Ex**terior-point **O**perator **S**plitting algorithm](http://www.optimization-online.org/DB_FILE/2020/11/8099.pdf) (**NExOS**). The package is tailored for minimizing a convex cost function over a nonconvex constraint set, where projection onto the constraint set is single-valued around points of interest. These types of sets are called *prox-regular* sets, *e.g.*, sets containing low-rank and sparsity constraints. 
+``NExOS.jl`` is a `Julia` package that implements **N**onconvex **Ex**terior-point **O**ptimization **S**olver (**NExOS**). The package is tailored for minimizing a convex cost function over a nonconvex constraint set.
 
 ``NExOS.jl`` considers nonconvex optimization problems of the following form:
 
@@ -18,7 +17,7 @@ minimize    f(x)+(β/2)‖x‖^2
 subject to  x ∈ X,
 ```
 
-where the decision variable `x` can be a vector in `ℜ^d` or a matrix in `ℜ^(m×d)` or a combination of both. The cost function `f` is convex, `β` is a positive parameter (can be arbitrarily small), and the constraint set `X` is a nonconvex prox-regular set (please see [Acceptable functions and sets](#Acceptable-functions-and-sets) for more details). 
+where the decision variable `x` can be a vector in `ℜ^d` or a matrix in `ℜ^(m×d)` or a combination of both. The cost function `f` is convex, `β` is a positive parameter (can be arbitrarily small), and the constraint set `X` is a nonconvex set (please see [Acceptable functions and sets](#Acceptable-functions-and-sets) for more details). 
 
 ## Installation
 
@@ -46,7 +45,7 @@ beta = 10^-10
 # Create the problem instance in NExOS
 C = SparseSet(M, k) # Create the set
 f = LeastSquares(A, b, iterative = true) # Create the function
-settings = Settings(μ_max = 2, μ_min = 1e-8, μ_mult_fact = 0.85, verbose = false, freq = 250, γ_updt_rule = :adaptive, β = beta) # settings
+settings = Settings(μ_max = 2, μ_mult_fact = 0.85, verbose = false, freq = 250, γ_updt_rule = :adaptive, β = beta) # settings
 z0 = zeros(n) # create an initial point
 problem = Problem(f, C, settings.β, z0) # problem instance
 
@@ -70,12 +69,12 @@ p_star = f(x_NExOS) # objective value
 
 ##### Constraint set `X`
 
-The constraint set `X` is nonconvex, but it can be decomposed into a convex compact set `C` and a nonconvex prox-regular set `N`, *i.e.*, `X = C ⋂ N`. For example:
+The constraint set `X` is nonconvex, but it can be decomposed into a convex compact set `C` and a nonconvex set `N`, *i.e.*, `X = C ⋂ N`. For example:
 
 1. **Sparse set.**  `N = {x ∈ ℜ^d ∣ card(x) ≦ k}`, where `card(x)` denotes the number of nonzero components in `x`,
 2. **Low-rank set.**  `N = { X ∈ ℜ^(m×d) ∣ rank(X) ≦ r}`, where `rank(X)` denotes the rank of the matrix `X`,
 3. **Combination of low-rank and sparse set.**  `N = {X ∈ ℜ^(m×d), x ∈ ℜ^d ∣ card(x) ≦ k, rank(X) ≦ r}`,  
-4. **Any other prox-regular set.**  `N` can be any other prox-regular sets, *e.g.,* weakly convex sets, proximally smooth sets, *etc.* 
+4. **Any other prox-regular set.**  `N` can be any other nonconvex set such that projection around local minima is single-valued, *e.g.,* weakly convex sets, proximally smooth sets, *etc.* 
 
 ## Tutorials
 
@@ -91,7 +90,7 @@ Please see the following `jupyter notebook` tutorials that describe in more deta
 If you find `NExOS.jl` useful in your project, we kindly request that you cite the following paper:
 ```
 @article{NExOS,
-  title={Exterior-point Operator Splitting for Nonconvex Learning},
+  title={Exterior-point Optimization for Nonconvex Learning},
   author={Das Gupta, Shuvomoy and Stellato, Bartolomeo and Van Parys, Bart P.G.},
   journal={arXiv preprint arXiv:2011.04552},
   note={\url{https://arxiv.org/pdf/2011.04552.pdf}},
@@ -105,5 +104,4 @@ Please report any issues via the [Github issue tracker](https://github.com/Shuvo
 
 ## Contact
 Send an email :email: to [sdgupta@mit.edu](mailto:sdgupta@mit.edu) :rocket:!	
-
 
