@@ -9,7 +9,7 @@
   <a href="#Contact">Contact</a> 
 </p>
 
-`NExOS.jl` is a `Julia` package that implements **N**onconvex **E**xterior-point **O**ptimization **S**olver (NExOS). The package is tailored for minimizing a convex cost function over a nonconvex constraint set. 
+`NExOS.jl` is a `Julia` package that implements the **N**onconvex **E**xterior-point **O**ptimization **S**olver (NExOS). The package is tailored for minimizing a convex cost function over a nonconvex constraint set. 
 
 ``NExOS.jl`` considers nonconvex optimization problems of the following form:
 
