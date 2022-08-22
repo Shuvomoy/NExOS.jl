@@ -1,3 +1,4 @@
 /Manifest.toml
 *.jld2
 numerical_experiments/*
+.DS_Store
