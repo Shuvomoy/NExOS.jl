@@ -14,12 +14,12 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 TSVD = "9449cd9e-2762-5aa3-a617-5413e99d722e"
 
 [compat]
-JuMP = ">= 1.2.1"
-MosekTools = ">= 0.12.1"
-OSQP = ">= 0.8.0"
-ProximalOperators = ">= 0.15.3"
-TSVD = ">= 0.4.3"
-julia = "1.6"
+JuMP = "^1.2.1"
+MosekTools = "^0.12.1"
+OSQP = "^0.8.0"
+ProximalOperators = "^0.15.3"
+TSVD = "^0.4.3"
+julia = "^1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
