@@ -188,7 +188,7 @@ function inner_iteration(x::A, y::A, z::A, β::R, γ::R, μ::R, problem::Problem
 end
 
 ## proximal function on f: this is the old function to be removed later
-# function prox_NExOS(f::ProximableFunction, β::R, γ::R, x::A) where {R <: Real, A <: AbstractVecOrMat{<:Real}}
+# function prox_NExOS(f, β::R, γ::R, x::A) where {R <: Real, A <: AbstractVecOrMat{<:Real}}
 #     prox_param = γ/((β*γ)+1)
 #     scaled_input = (1/((β*γ)+1)).*x
 #     prox_point = similar(x) # allocate prox_NExOS output
@@ -197,7 +197,7 @@ end
 # end
 
 ## New proximal function, no scaling required
-function prox_NExOS(f::ProximableFunction, γ::R, x::A) where {R <: Real, A <: AbstractVecOrMat{<:Real}}
+function prox_NExOS(f, γ::R, x::A) where {R <: Real, A <: AbstractVecOrMat{<:Real}}
     prox_point = similar(x) # allocate prox_NExOS output
     prox!(prox_point, f, x, γ) # this is the prox! function from the ProximalOperators package
     return prox_point

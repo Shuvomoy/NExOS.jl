@@ -19,7 +19,7 @@ abstract type ProxRegularSet end
 # # problem
 # This structure contains the function, the set, value of parameter β, and an intial point.
 
-struct Problem{F <: ProximableFunction, S <: ProxRegularSet, R <: Real, A <: AbstractVecOrMat{ <:Real}}
+struct Problem{F, S <: ProxRegularSet, R <: Real, A <: AbstractVecOrMat{ <:Real}}
 
     f::F # the objective function
     C::S # the constraint set
@@ -258,7 +258,7 @@ end
 ## Let us define the function least squares over matrices
 
 
-abstract type LeastSquaresOverMatrix <: ProximableFunction end
+abstract type LeastSquaresOverMatrix end
 
 is_smooth(f::LeastSquaresOverMatrix) = true
 
@@ -347,7 +347,7 @@ end
 
 # time to define the squared loss function
 
-abstract type SquaredLossMatrixCompletion <: ProximableFunction end
+abstract type SquaredLossMatrixCompletion end
 
 is_smooth(f::SquaredLossMatrixCompletion) = true
 
