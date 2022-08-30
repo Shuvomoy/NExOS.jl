@@ -6,7 +6,7 @@
 
 # First, we load the packages.
 
-using ProximalOperators, LinearAlgebra, TSVD, SparseArrays, OSQP, JuMP, MosekTools
+using ProximalOperators, LinearAlgebra, TSVD, SparseArrays, OSQP, JuMP, MosekTools, IterativeSolvers
 
 ##%% All the necessary types
 
@@ -365,4 +365,103 @@ function SquaredLossMatrixCompletion(Zobs::AbstractMatrix{R}, lam::R=R(1); itera
         ProximalOperators.LeastSquaresIterative(A, b, lam)
     end
 
+end
+
+## least squares penalty with variable tolerance via iterative cg solver
+
+export LeastSquaresNExOS
+
+### ABSTRACT TYPE
+
+abstract type LeastSquaresNExOS end
+
+is_smooth(::Type{<:LeastSquaresNExOS}) = true
+is_generalized_quadratic(::Type{<:LeastSquaresNExOS}) = true
+
+### CONSTRUCTORS
+
+
+function LeastSquaresNExOS(A, b; lam=1, tol = 1e-4)
+        LeastSquaresIterativeCstmTol(A, b, lam, tol)
+end
+
+infer_shape_of_x(A, ::AbstractVector) = (size(A, 2), )
+infer_shape_of_x(A, b::AbstractMatrix) = (size(A, 2), size(b, 2))
+
+using LinearAlgebra
+
+struct LeastSquaresIterativeCstmTol{N, R, RC, M, V, O, IsConvex} <: LeastSquaresNExOS
+    A::M # m-by-n operator
+    b::V # m (by-p)
+    lambda::R
+    lambdaAtb::V
+    shape::Symbol
+    S::O
+    res::Array{RC, N} # m (by-p)
+    res2::Array{RC, N} # m (by-p)
+    q::Array{RC, N} # n (by-p)
+    tol::R
+end
+
+is_prox_accurate(f::Type{<:LeastSquaresIterativeCstmTol}) = false
+is_convex(::Type{LeastSquaresIterativeCstmTol{N, R, RC, M, V, O, IsConvex}}) where {N, R, RC, M, V, O, IsConvex} = IsConvex
+
+function LeastSquaresIterativeCstmTol(A::M, b, lambda, tol) where M
+    if size(A, 1) != size(b, 1)
+        error("A and b have incompatible dimensions")
+    end
+    m, n = size(A)
+    x_shape = infer_shape_of_x(A, b)
+    shape, S, res2 = if m >= n
+        :Tall, AcA(A, x_shape), []
+    else
+        :Fat, AAc(A, size(b)), zero(b)
+    end
+    RC = eltype(A)
+    R = real(RC)
+    LeastSquaresIterativeCstmTol{ndims(b), R, RC, M, typeof(b), typeof(S), lambda >= 0}(A, b, R(lambda), lambda*(A'*b), shape, S, zero(b), res2, zeros(RC, x_shape), R(tol))
+end
+
+function (f::LeastSquaresIterativeCstmTol)(x)
+    mul!(f.res, f.A, x)
+    f.res .-= f.b
+    return (f.lambda/2)*norm(f.res, 2)^2
+end
+
+function prox!(y, f::LeastSquaresIterativeCstmTol, x, gamma)
+    @info "[🎴 ] calling Shuvo's custom prox on LeastSquaresIterativeCstmTol"
+    f.q .= f.lambdaAtb .+ x./gamma
+    RC = eltype(f.S)
+    # two cases: (1) tall A, (2) fat A
+    if f.shape == :Tall
+        y .= x
+        op = ScaleShift(RC(f.lambda), f.S, RC(1)/gamma)
+        IterativeSolvers.cg!(y, op, f.q; abstol = f.tol)
+    else # f.shape == :Fat
+        # y .= gamma*(f.q - lambda*(f.A'*(f.fact\(f.A*f.q))))
+        mul!(f.res, f.A, f.q)
+        op = ScaleShift(RC(f.lambda), f.S, RC(1)/gamma)
+        IterativeSolvers.cg!(f.res2, op, f.res; abstol = f.tol)
+        mul!(y, adjoint(f.A), f.res2)
+        y .*= -f.lambda
+        y .+= f.q
+        y .*= gamma
+    end
+    mul!(f.res, f.A, y)
+    f.res .-= f.b
+    return (f.lambda/2)*norm(f.res, 2)^2
+end
+
+function gradient!(y, f::LeastSquaresIterativeCstmTol, x)
+    mul!(f.res, f.A, x)
+    f.res .-= f.b
+    mul!(y, adjoint(f.A), f.res)
+    y .*= f.lambda
+    return (f.lambda / 2) * real(dot(f.res, f.res))
+end
+
+function prox_naive(f::LeastSquaresIterativeCstmTol, x, gamma)
+    y = IterativeSolvers.cg(f.lambda*f.A'*f.A + I/gamma, f.lambda*f.A'*f.b + x/gamma)
+    fy = (f.lambda/2)*norm(f.A*y-f.b)^2
+    return y, fy
 end

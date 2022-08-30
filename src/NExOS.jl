@@ -6,7 +6,7 @@ include("./types.jl")
 
 # Export all the types, and functions for usage
 
-export ProxRegularSet, Problem, Settings, State, InitInfo, SparseSet, RankSet,  LeastSquaresOverMatrix, SquaredLossMatrixCompletion, affine_operator_to_matrix
+export ProxRegularSet, Problem, Settings, State, InitInfo, SparseSet, RankSet,  LeastSquaresOverMatrix, SquaredLossMatrixCompletion, affine_operator_to_matrix, LeastSquaresIterativeCstmTol, LeastSquaresNExOS
 
 # Next, we include the utils file
 
@@ -19,6 +19,7 @@ export Π_exact, update_state!, inner_iteration, prox_NExOS,  Π_NExOS, update_i
 include("./factor_analysis.jl")
 
 export ProblemFactorAnalysisModel, StateFactorAnalysisModel, InitInfoFactorAnalysisModel, update_state_fam!, inner_iteration_fam, prox_NExOS_fam
+
 
 
 
