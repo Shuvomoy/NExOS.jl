@@ -429,7 +429,7 @@ function (f::LeastSquaresIterativeCstmTol)(x)
 end
 
 function prox!(y, f::LeastSquaresIterativeCstmTol, x, gamma)
-    @info "[🎴 ] calling Shuvo's custom prox on LeastSquaresIterativeCstmTol"
+    # @info "[🎴 ] calling Shuvo's custom prox on LeastSquaresIterativeCstmTol"
     f.q .= f.lambdaAtb .+ x./gamma
     RC = eltype(f.S)
     # two cases: (1) tall A, (2) fat A
