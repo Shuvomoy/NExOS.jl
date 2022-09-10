@@ -7,7 +7,7 @@ struct SettingsLSR
     # first comes description of different data type
 
     μ_max::Float64 # starting μ
-    μ_min::Float64 # ending μ
+    μ_min_input::Float64 # ending μ
     μ_mult_fact::Float64 # multiplicative factor to reduce μ
     n_iter_min::Int64 # minimum number of iterations per fixed μ
     n_iter_max::Int64 # maximum number of iterations per fixed μ
@@ -21,7 +21,7 @@ struct SettingsLSR
     # constructor function
     function SettingsLSR(;
         μ_max = 1.0,
-        μ_min = 1e-12,
+        μ_min_input = 1e-12,
         μ_mult_fact = 0.85,
         n_iter_min = 1000,
         n_iter_max = 1000,
@@ -32,16 +32,18 @@ struct SettingsLSR
         freq = 10,
         γ_updt_rule = :safe
         )
-        new(μ_max, μ_min, μ_mult_fact, n_iter_min, n_iter_max, big_M, β, tol, verbose, freq, γ_updt_rule)
+        new(μ_max, μ_min_input, μ_mult_fact, n_iter_min, n_iter_max, big_M, β, tol, verbose, freq, γ_updt_rule)
     end
 
 end
+
+methods(SettingsLSR)
 
 ##
 
 function γ_from_μ_LSR(μ::R, settings::SettingsLSR) where {R <: Real}
     if settings.γ_updt_rule == :safe
-        return abs(cbrt(settings.μ_min)) # cbrt also works quite well
+        return abs(cbrt(settings.μ_min_input)) # cbrt also works quite well
     else
         @error "either select :adaptive or :safe or :adaptiveplus as your γ selection rule"
         return nothing
@@ -116,7 +118,7 @@ function StateLargeSparseRegModel(problem::ProblemLargeSparseRegModel, settings:
     fxd_pnt_gap = copy(settings.big_M)
     fsblt_gap = copy(settings.big_M)
     μ = copy(settings.μ_max)
-    γ = abs(cbrt(settings.μ_min)) # γ_from_μ_LSR(μ, settings)
+    γ = abs(cbrt(settings.μ_min_input)) # γ_from_μ_LSR(μ, settings)
     ϵProx = ϵProxGenerate(i; tolerance_type = :constant)
 
     return StateLargeSparseRegModel(x0Prev, y0Prev, z0Prev, x0, y0, z0, i, fxd_pnt_gap, fsblt_gap, μ, γ, ϵProx)
@@ -144,7 +146,7 @@ function InitInfoLargeSparseRegModel(problem::ProblemLargeSparseRegModel, settin
     ## constructs the initial NExOS information
     z0 = copy(problem.z0)
     μ = copy(settings.μ_max)
-    γ = abs(cbrt(settings.μ_min)) # γ_from_μ_LSR(μ, settings)
+    γ = abs(cbrt(settings.μ_min_input)) # γ_from_μ_LSR(μ, settings)
     ϵProx = ϵProxGenerate(1; tolerance_type = :constant)# copy(settings.ϵ_prox)
     return InitInfoLargeSparseRegModel(z0, μ, γ, ϵProx)
 
@@ -305,20 +307,28 @@ end
 # =========================================================
 
 function prox_NExOS_lsr(GMat::A, hVec::V,  γ::R, zPrev::V, xPrev::V, ϵProx::R, PMat) where {R <: Real, A <: AbstractMatrix{R}, V <:  AbstractVector{R}}
-    sol = copy(xPrev)
-    # cg!(sol, GMat, hVec + (1/γ).*zPrev; Pl = PMat, abstol = 1e-4)
+
     # recall that: GMat ≡ (λ*A'*A) + (1/γ)*I
     #          and hVec ≡ λ*A'*b
     Anew = [0.0026751207469390887 -1.7874010558441433 1.9570015234024314 0.48297821744005304 0.5499471860787609; -1.1926192117844148 -0.2962711608418759 0.34270253049651844 -0.9366799738457191 2.6135543879953094; -2.3956100254067567 1.5957363630260428 -0.5408329087542932 -1.595958552841769 -1.6414598361443185; 0.6791192541307551 2.895535427621422 -0.6676549207144326 -0.49424052539586016 -0.4336822064078515; 2.201382399088591 -0.578227952607833 -0.17602060199064307 -0.46261612338452723 0.24784285430931077; -0.49522601422578916 0.44636764792131967 1.2906418721153354 0.8301596930345838 0.5837176074011505];
 
     bnew = [-0.7765194270735608, 0.28815810383363427, -0.07926006593887291, 0.5659412043036721, 1.3718921913877151, 0.8834692513807884];
 
-    sol1 = inv((2*Anew'*Anew) + (I/γ))*( (2*Anew'*bnew) + (zPrev ./ γ))
+    # γ = abs(cbrt(μ_min_input))
 
-    f = LeastSquares(Anew, bnew, iterative = true)
+    sol = copy(xPrev)
+
+    @show GMat
+
+    @show norm(GMat - ((2*Anew'*Anew) + (I/γ)))
+    cg!(sol, (2*Anew'*Anew) + (I/γ),   (2*Anew'*bnew) + (zPrev ./ γ); Pl = PMat, abstol = 1e-4)
+
+    # sol1 = inv((2*Anew'*Anew) + (I/γ))*( (2*Anew'*bnew) + (zPrev ./ γ))
+
+    f = LeastSquares(Anew, bnew, 2; iterative = true)
     prox_point = similar(xPrev) # allocate prox_NExOS output
     prox!(prox_point, f, zPrev, γ) # this is the prox! function from the ProximalOperators package
-    sol = prox_point
+    sol1 = prox_point
     @show norm(sol1-sol)
     return sol
 end
@@ -329,7 +339,7 @@ end
 function update_init_info!(state::StateLargeSparseRegModel, init_info::InitInfoLargeSparseRegModel, problem::ProblemLargeSparseRegModel, settings::SettingsLSR)
 
     init_info.μ = init_info.μ*settings.μ_mult_fact
-    init_info.γ = abs(cbrt(settings.μ_min)) # γ_from_μ(init_info.μ, settings)
+    init_info.γ = abs(cbrt(settings.μ_min_input)) # γ_from_μ(init_info.μ, settings)
     init_info.z0 = state.z
     init_info.ϵProx = ϵProxGenerate(1; tolerance_type = :constant)
 
@@ -351,7 +361,7 @@ function solve!(problem::ProblemLargeSparseRegModel, settings::SettingsLSR)
 
     # now this first state goes into the iteration_outer!(state, problem, settings) and we keep running it until our termination condtion has been met
     
-    while state.μ >= μ_min # settings.μ_min
+    while state.μ >= μ_min_input # settings.μ_min
         # run the inner iteration algorithm update procedure
         state = update_state_lsr!(state, init_info, problem, settings)
         init_info = update_init_info!(state, init_info, problem, settings)
