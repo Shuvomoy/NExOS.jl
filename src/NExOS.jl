@@ -22,6 +22,10 @@ include("./factor_analysis.jl")
 
 export ProblemFactorAnalysisModel, StateFactorAnalysisModel, InitInfoFactorAnalysisModel, update_state_fam!, inner_iteration_fam, prox_NExOS_fam
 
+include("./large_scale_sparse_regression.jl")
+
+export ϵProxGen, ProblemLargeSparseRegModel, StateLargeSparseRegModel, InitInfoLargeSparseRegModel, update_state_lsr!, inner_iteration_lsr, Π_exact_lsr, Π_NExOS_lsr, prox_NExOS_lsr, update_init_info!, solve!
+
 
 
 # Export all the types, and functions for usage from the utils
