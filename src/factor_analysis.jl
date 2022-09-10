@@ -92,7 +92,7 @@ function update_state_fam!(state::StateFactorAnalysisModel, init_info::InitInfoF
     # create best point variables
     best_point_X = X
     best_point_x = x
-    best_point_Y = y
+    best_point_Y = Y
     best_point_y = y
     best_point_Z = Z
     best_point_z = z
