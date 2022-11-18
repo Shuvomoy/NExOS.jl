@@ -1,6 +1,4 @@
 # ```NExOS.jl```
-[![Build Status](https://travis-ci.com/Shuvomoy/NExOS.jl.svg?branch=master)](https://travis-ci.com/Shuvomoy/NExOS.jl)
-
 <p align="center">
   <a href="#Installation">Installation</a> •
   <a href="#Usage">Usage</a> •
