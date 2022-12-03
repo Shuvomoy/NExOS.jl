@@ -16,8 +16,8 @@ IterativeSolvers = "42fd0dbc-a981-5370-80f2-aaf504508153"
 Preconditioners = "af69fa37-3177-5a40-98ee-561f696e4fcd"
 
 [compat]
-JuMP = "^1"
-MosekTools = "^0.12"
+JuMP = "^1.4"
+MosekTools = "^0"
 OSQP = "^0.8"
 ProximalOperators = "^0.15"
 TSVD = "^0.4"
