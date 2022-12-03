@@ -1,7 +1,7 @@
 name = "NExOS"
 uuid = "a0d681ee-6dde-4d9d-b128-06c773d9ceb4"
 authors = ["Shuvomoy Das Gupta <shuvomoy.dasgupta@gmail.com>"]
-version = "0.1.7"
+version = "0.1.8"
 
 [deps]
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
