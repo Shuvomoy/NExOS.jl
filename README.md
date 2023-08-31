@@ -89,11 +89,11 @@ Please see the following `jupyter notebook` tutorials that describe in more deta
 If you find `NExOS.jl` useful in your project, we kindly request that you cite the following paper:
 ```
 @article{NExOS,
-  title={Exterior-point Optimization for Nonconvex Learning},
+  title={Exterior-point Optimization for Sparse and Low-rank Optimization},
   author={Das Gupta, Shuvomoy and Stellato, Bartolomeo and Van Parys, Bart P.G.},
   journal={arXiv preprint arXiv:2011.04552},
   note={\url{https://arxiv.org/pdf/2011.04552.pdf}},
-  year={2020}
+  year={2023}
 }
 ```
 A preprint can be downloaded [here](http://www.optimization-online.org/DB_FILE/2020/11/8099.pdf).
